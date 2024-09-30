@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pointage des heures - Employé</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .time-display {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button.end {
+            background-color: #dc3545;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        button.end:hover:not(:disabled) {
+            background-color: #c82333;
+        }
+
+        .log {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #555;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #current-time {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tableau de Bord Employé</h1>
+
+    <div class="time-display">
+        <p><strong>Heure actuelle :</strong> <span id="current-time"></span></p>
+    </div>
+
+    <button id="start-btn">Je suis arrivé</button>
+    <button id="end-btn" class="end" disabled>Je pars</button>
+
+    <div class="log">
+        <h2>Historique des pointages</h2>
+        <ul id="log-list"></ul>
+    </div>
+</div>
+
+<script>
+    // Fonction pour afficher l'heure actuelle en temps réel
+    function updateCurrentTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('current-time').textContent = timeString;
+    }
+
+    setInterval(updateCurrentTime, 1000);  // Mettre à jour l'heure chaque seconde
+
+    // Variables pour garder la trace des pointages avant et après midi
+    let hasArrivedBeforeNoon = false;
+    let hasArrivedAfterNoon = false;
+
+    const logList = document.getElementById('log-list');
+    const startBtn = document.getElementById('start-btn');
+    const endBtn = document.getElementById('end-btn');
+
+    // Vérifier si l'heure actuelle est avant ou après midi
+    function isBeforeNoon() {
+        const now = new Date();
+        return now.getHours() < 12;
+    }
+
+    // Gestion des boutons "Je suis arrivé" et "Je pars"
+    startBtn.addEventListener('click', function() {
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString();
+        const logItem = document.createElement('li');
+
+        // Vérification avant/après midi
+        if (isBeforeNoon()) {
+            if (hasArrivedBeforeNoon) {
+                alert("Vous avez déjà pointé avant midi.");
+                return;
+            } else {
+                logItem.textContent = `Arrivée avant midi : ${formattedTime}`;
+                hasArrivedBeforeNoon = true;
+            }
+        } else {
+            if (hasArrivedAfterNoon) {
+                alert("Vous avez déjà pointé après midi.");
+                return;
+            } else {
+                logItem.textContent = `Arrivée après midi : ${formattedTime}`;
+                hasArrivedAfterNoon = true;
+            }
+        }
+
+        logList.appendChild(logItem);
+
+        // Activer le bouton "Je pars" après avoir pointé
+        endBtn.disabled = false;
+        startBtn.disabled = true;
+    });
+
+    endBtn.addEventListener('click', function() {
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString();
+        const logItem = document.createElement('li');
+        logItem.textContent = `Départ : ${formattedTime}`;
+        logList.appendChild(logItem);
+
+        // Désactiver le bouton "Je pars" après le départ
+        endBtn.disabled = true;
+        startBtn.disabled = false;
+    });
+</script>
+
+</body>
+</html>
